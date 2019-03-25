@@ -35,10 +35,16 @@ function transformer(field) {
   case 'function': return field;
   case 'object':
     return (Array.isArray(field)) ?
-      v => v.map(transformer(field[0])):
+      thread(...field) :
       v => transform(field, v);
   default: return v => field;
   }
+}
+
+// mapper lifts a value transformer into an array transformer
+function mapper(fn) {
+  const tx = transformer(fn);
+  return vals => Array.prototype.map.call(vals, tx);
 }
 
 // thread takes a varying number of individual field transformers, and
@@ -73,5 +79,5 @@ function transform(spec, v0) {
 }
 
 export {
-  transform, relocate, valueMap, thread,
+  transform, relocate, valueMap, thread, mapper,
 };
